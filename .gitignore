@@ -1,0 +1,17 @@
+/build/
+*.sw?
+*~
+
+CMakeFiles
+cmake_install.cmake
+build.ninja
+CMakeCache.txt
+.ninja_deps
+.ninja_log
+conf
+libzconf.a
+mconf
+lxdialog/liblxdialog.a
+
+sdkconfig
+sdkconfig.old
