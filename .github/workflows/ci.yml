@@ -24,7 +24,7 @@ jobs:
             args: "-DDEBUG=OFF"
             expect: "DEBUG=OFF, CMAKE_BUILD_TYPE=Release"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: 安装依赖
         run: |
