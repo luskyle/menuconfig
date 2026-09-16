@@ -13,7 +13,7 @@ menuconfig
 
 ## 特性
 
-* 内核同款 TUI: 方向键导航、热键跳转、`<Y>`/`<N>`/`<M>` 选择、`?` 帮助、`/` 搜索
+* 内核同款 TUI: 方向键导航、`<Y>`/`<N>`/`<M>` 开关高亮项、`?` 或 `< Help >` 查看帮助、`/` 搜索
 * 完整 kconfig 语义: `bool` / `tristate` / `int` / `hex` / `string`、`choice`、`depends on`、`select`、多层子菜单与 `source` 文件包含
 * 生成 `sdkconfig`, 可直接被 CMake 读取为编译宏
 * `conf` 提供非交互模式 (`--olddefconfig` / `--defconfig` / `--allyesconfig` 等), 可放入脚本与 CI
