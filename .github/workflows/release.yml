@@ -39,7 +39,7 @@ jobs:
           STAGE="menuconfig-${VER}"
           mkdir -p "dist/${STAGE}"
           cp build/mconf build/conf "dist/${STAGE}/"
-          cp README.md LICENSE "dist/${STAGE}/"
+          cp README.md README.en.md LICENSE "dist/${STAGE}/"
           tar -C dist -czf "${STAGE}-linux-x86_64.tar.gz" "${STAGE}"
           sha256sum "${STAGE}-linux-x86_64.tar.gz" > "${STAGE}-linux-x86_64.tar.gz.sha256"
 
@@ -48,8 +48,19 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VER="${GITHUB_REF_NAME#v}"
-          gh release create "${GITHUB_REF_NAME}" \
-            "menuconfig-${VER}-linux-x86_64.tar.gz" \
-            "menuconfig-${VER}-linux-x86_64.tar.gz.sha256" \
-            --title "menuconfig ${VER}" \
-            --generate-notes
+          ASSETS=(
+            "menuconfig-${VER}-linux-x86_64.tar.gz"
+            "menuconfig-${VER}-linux-x86_64.tar.gz.sha256"
+          )
+          # 优先用仓库里写好的详细说明, 找不到再退回按提交自动生成
+          if [ -f "release-notes/${GITHUB_REF_NAME}.md" ]; then
+            echo "使用 release-notes/${GITHUB_REF_NAME}.md 作为发布说明"
+            gh release create "${GITHUB_REF_NAME}" "${ASSETS[@]}" \
+              --title "menuconfig++ ${VER}" \
+              --notes-file "release-notes/${GITHUB_REF_NAME}.md"
+          else
+            echo "未找到 release-notes/${GITHUB_REF_NAME}.md, 退回自动生成"
+            gh release create "${GITHUB_REF_NAME}" "${ASSETS[@]}" \
+              --title "menuconfig++ ${VER}" \
+              --generate-notes
+          fi
