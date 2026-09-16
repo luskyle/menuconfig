@@ -203,6 +203,10 @@
         <span>生成 <code>sdkconfig</code>（<code>CONFIG_XXX=y</code> 形式），CMake 正则解析后 <code>add_compile_definitions</code> 即可使用。</span>
       </li>
       <li>
+        <strong>中文界面</strong>
+        <span>链接宽字符版 <code>ncursesw</code>，标题、菜单、帮助窗口一律按显示列宽居中与截断，中文配置项不会错位，也不会被砍成半个字。</span>
+      </li>
+      <li>
         <strong>非交互模式，能进 CI</strong>
         <span><code>conf</code> 支持 <code>--olddefconfig</code> / <code>--defconfig</code> / <code>--savedefconfig</code> / <code>--allyesconfig</code> 等批处理模式，适合脚本和流水线。</span>
       </li>
@@ -312,7 +316,7 @@ endforeach()</pre>
   <div class="wrap">
     <h2><span class="hash">#</span> 已知问题</h2>
     <ul>
-      <li>中文配置项的界面展示仍有排版问题（详见仓库 README 的 TODO）。</li>
+      <li>输入框（字符串参数、<code>/</code> 搜索、<code>Save as</code> 文件名）暂不支持直接键入或编辑中文；界面<em>显示</em>中文已正常。</li>
     </ul>
   </div>
 </section>
