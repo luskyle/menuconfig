@@ -3,162 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>menuconfig — 图形化生成项目宏配置</title>
+<title>menuconfig++ — 图形化生成项目宏配置</title>
 <meta name="description" content="源自 Linux 内核 kconfig/mconf 的独立配置工具，用于图形化生成项目宏配置，输出可被 CMake 直接读取的 sdkconfig。">
-<style>
-  :root {
-    --bg: #ffffff;
-    --bg-soft: #f6f8fa;
-    --fg: #1f2328;
-    --fg-muted: #59636e;
-    --border: #d1d9e0;
-    --accent: #0969da;
-    --accent-soft: #ddf4ff;
-    --term-bg: #161b22;
-    --term-fg: #e6edf3;
-    --term-accent: #7ee787;
-    --radius: 10px;
-    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0d1117;
-      --bg-soft: #151b23;
-      --fg: #e6edf3;
-      --fg-muted: #9198a1;
-      --border: #30363d;
-      --accent: #4493f8;
-      --accent-soft: #121d2f;
-    }
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--fg);
-    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", Helvetica, Arial, sans-serif;
-  }
-  a { color: var(--accent); }
-  code, pre { font-family: var(--mono); font-size: 0.875em; }
-  .wrap { max-width: 940px; margin: 0 auto; padding: 0 20px; }
-
-  nav {
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-    position: sticky; top: 0; z-index: 10;
-  }
-  nav .wrap {
-    display: flex; align-items: center; gap: 18px;
-    height: 56px; flex-wrap: wrap;
-  }
-  nav .brand { font-family: var(--mono); font-weight: 600; margin-right: auto; }
-  nav a.plain { color: var(--fg-muted); text-decoration: none; font-size: 14px; }
-  nav a.plain:hover { color: var(--accent); }
-
-  header.hero { padding: 56px 0 40px; }
-  header.hero h1 {
-    font-family: var(--mono);
-    font-size: clamp(30px, 5vw, 46px);
-    margin: 0 0 12px;
-    letter-spacing: -0.02em;
-  }
-  header.hero p.lead {
-    font-size: 18px; color: var(--fg-muted); margin: 0 0 24px; max-width: 42em;
-  }
-  .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
-  .badges img { display: block; height: 20px; }
-  .btns { display: flex; gap: 12px; flex-wrap: wrap; }
-  .btn {
-    display: inline-block; padding: 10px 18px; border-radius: 8px;
-    text-decoration: none; font-weight: 600; font-size: 15px;
-    border: 1px solid var(--border);
-  }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn.primary:hover { filter: brightness(1.1); }
-  .btn.ghost { color: var(--fg); background: var(--bg-soft); }
-  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
-
-  figure.term {
-    margin: 36px 0 0; padding: 14px;
-    background: var(--term-bg); border-radius: var(--radius);
-    box-shadow: 0 8px 28px rgba(0,0,0,.22);
-  }
-  figure.term::before {
-    content: ""; display: block; height: 10px; margin-bottom: 10px;
-    background:
-      radial-gradient(circle at 6px 5px, #ff5f57 5px, transparent 5.5px),
-      radial-gradient(circle at 24px 5px, #febc2e 5px, transparent 5.5px),
-      radial-gradient(circle at 42px 5px, #28c840 5px, transparent 5.5px);
-  }
-  figure.term img { display: block; width: 100%; height: auto; border-radius: 6px; }
-  figure.term figcaption {
-    color: #9198a1; font-size: 13px; font-family: var(--mono);
-    padding: 10px 4px 0; text-align: center;
-  }
-
-  section { padding: 44px 0; border-top: 1px solid var(--border); }
-  section h2 { font-size: 22px; margin: 0 0 22px; }
-  section h2 .hash { color: var(--fg-muted); font-family: var(--mono); font-weight: 400; }
-
-  ul.features { list-style: none; padding: 0; margin: 0;
-    display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-  ul.features li {
-    background: var(--bg-soft); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px 18px;
-  }
-  ul.features strong { display: block; margin-bottom: 6px; font-size: 15px; }
-  ul.features span { color: var(--fg-muted); font-size: 14px; }
-
-  pre {
-    background: var(--term-bg); color: var(--term-fg);
-    padding: 16px 18px; border-radius: var(--radius);
-    overflow-x: auto; line-height: 1.6; margin: 0 0 14px;
-  }
-  pre .c { color: var(--term-accent); }
-  pre .p { color: #79c0ff; }
-  p code, li code, td code, h3 code {
-    background: var(--bg-soft); border: 1px solid var(--border);
-    border-radius: 5px; padding: 1px 5px;
-  }
-  h3 { font-size: 16px; margin: 26px 0 10px; }
-  h3:first-of-type { margin-top: 0; }
-
-  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
-  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
-  th { color: var(--fg-muted); font-weight: 600; white-space: nowrap; }
-  td:first-child { white-space: nowrap; }
-  .tbl-wrap { overflow-x: auto; }
-
-  .note {
-    border-left: 3px solid var(--accent); background: var(--accent-soft);
-    padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0;
-    font-size: 14.5px; color: var(--fg);
-  }
-
-  footer {
-    border-top: 1px solid var(--border); padding: 28px 0 44px;
-    color: var(--fg-muted); font-size: 14px;
-  }
-  footer p { margin: 0 0 8px; }
-</style>
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
 <nav>
   <div class="wrap">
-    <span class="brand">menuconfig</span>
+    <span class="brand">menuconfig++</span>
     <a class="plain" href="#features">特性</a>
     <a class="plain" href="#install">安装</a>
     <a class="plain" href="#usage">使用</a>
     <a class="plain" href="#cmake">接入 CMake</a>
     <a class="plain" href="https://github.com/luskyle/menuconfig">GitHub</a>
+    <a class="plain lang" href="en/">English</a>
   </div>
 </nav>
 
 <header class="hero">
   <div class="wrap">
-    <h1>menuconfig</h1>
+    <h1>menuconfig++</h1>
     <p class="lead">
       源自 Linux 内核 <code>kconfig</code> / <code>mconf</code> 的独立配置工具。
       用熟悉的图形菜单配置项目宏，生成 <code>sdkconfig</code>，可直接被 CMake 读取为编译宏。

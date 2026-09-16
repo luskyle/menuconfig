@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>menuconfig++ — graphical project macro configuration</title>
+<meta name="description" content="A standalone configuration tool derived from the Linux kernel's kconfig/mconf: configure project macros in a menu UI and generate an sdkconfig that CMake reads directly.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <span class="brand">menuconfig++</span>
+    <a class="plain" href="#features">Features</a>
+    <a class="plain" href="#install">Install</a>
+    <a class="plain" href="#usage">Usage</a>
+    <a class="plain" href="#cmake">CMake</a>
+    <a class="plain" href="https://github.com/luskyle/menuconfig">GitHub</a>
+    <a class="plain lang" href="../">简体中文</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>menuconfig++</h1>
+    <p class="lead">
+      A standalone configuration tool derived from the Linux kernel's <code>kconfig</code> / <code>mconf</code>.
+      Configure your project's macros through the familiar menu UI and generate an <code>sdkconfig</code>
+      that CMake can read directly as compile definitions.
+    </p>
+
+    <div class="badges">
+      <a href="https://github.com/luskyle/menuconfig/actions/workflows/ci.yml">
+        <img src="https://github.com/luskyle/menuconfig/actions/workflows/ci.yml/badge.svg" alt="CI status">
+      </a>
+      <a href="https://github.com/luskyle/menuconfig/releases/latest">
+        <img src="https://img.shields.io/github/v/release/luskyle/menuconfig?label=release" alt="Latest release">
+      </a>
+      <img src="https://img.shields.io/badge/platform-linux-x86__64-informational" alt="Platform: linux-x86_64">
+    </div>
+
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/luskyle/menuconfig/releases/latest">Download latest</a>
+      <a class="btn ghost" href="https://github.com/luskyle/menuconfig">View source</a>
+    </div>
+
+    <figure class="term">
+      <img src="../assets/1723619417014.png" alt="The main menu of menuconfig++: a title bar reading .config - Main Menu, a navigable list of configuration entries, and Select / Exit / Help buttons at the bottom">
+      <figcaption>mconf .config - Main Menu</figcaption>
+    </figure>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <h2><span class="hash">#</span> Features</h2>
+    <ul class="features">
+      <li>
+        <strong>Kernel-style TUI</strong>
+        <span>Arrow-key navigation, <code>&lt;Y&gt;</code>/<code>&lt;N&gt;</code>/<code>&lt;M&gt;</code> to toggle the highlighted entry, <code>?</code> or <code>&lt; Help &gt;</code> for help, <code>/</code> to search — the same muscle memory as the Linux kernel's <code>menuconfig</code>.</span>
+      </li>
+      <li>
+        <strong>Full kconfig semantics</strong>
+        <span><code>bool</code> / <code>tristate</code> / <code>int</code> / <code>hex</code> / <code>string</code>, <code>choice</code>, <code>depends on</code>, <code>select</code>, nested submenus and <code>source</code> includes.</span>
+      </li>
+      <li>
+        <strong>Output that goes straight into your build</strong>
+        <span>Generates <code>sdkconfig</code> (<code>CONFIG_XXX=y</code> form); parse it in CMake and feed it to <code>add_compile_definitions</code>.</span>
+      </li>
+      <li>
+        <strong>CJK-ready UI</strong>
+        <span>Links the wide-character <code>ncursesw</code>; titles, menus and help windows are centered and truncated by <em>display width</em>, so Chinese/Japanese/Korean entries neither misalign nor get sliced in half.</span>
+      </li>
+      <li>
+        <strong>Non-interactive modes, CI-friendly</strong>
+        <span><code>conf</code> supports <code>--olddefconfig</code> / <code>--defconfig</code> / <code>--savedefconfig</code> / <code>--allyesconfig</code> and more, for scripts and pipelines.</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <h2><span class="hash">#</span> Install</h2>
+
+    <h3>Option 1: prebuilt binary</h3>
+    <p>Grab <code>menuconfig-&lt;version&gt;-linux-x86_64.tar.gz</code> from <a href="https://github.com/luskyle/menuconfig/releases/latest">Releases</a>. It unpacks to <code>mconf</code> (menu UI) and <code>conf</code> (command line):</p>
+<pre><span class="c">$</span> tar -xzf menuconfig-*-linux-x86_64.tar.gz
+<span class="c">$</span> cd menuconfig-*
+<span class="c">$</span> ./mconf test/rootconf</pre>
+
+    <h3>Option 2: build from source</h3>
+    <p>The only dependencies are a C compiler and the ncurses development library (it provides the wide-character library used below):</p>
+<pre><span class="c">#</span> Debian / Ubuntu
+<span class="c">$</span> sudo apt install -y libncurses-dev cmake ninja-build
+
+<span class="c">$</span> git clone https://github.com/luskyle/menuconfig.git
+<span class="c">$</span> cd menuconfig
+<span class="c">$</span> cmake -S . -B build -G Ninja
+<span class="c">$</span> cmake --build build</pre>
+    <div class="note">
+      The build type is controlled by <code>-DDEBUG</code> and <code>-DCMAKE_BUILD_TYPE</code>:
+      <code>DEBUG=ON</code> (the default) yields a Debug build with debug info, while
+      <code>-DDEBUG=OFF</code> yields Release; an explicit <code>-DCMAKE_BUILD_TYPE=...</code> always wins.
+    </div>
+  </div>
+</section>
+
+<section id="usage">
+  <div class="wrap">
+    <h2><span class="hash">#</span> Usage</h2>
+
+    <h3>Menu UI</h3>
+<pre><span class="c">$</span> ./mconf test/rootconf</pre>
+    <p>Point it at your own kconfig entry file instead of <code>test/rootconf</code>. On exit, choosing to save writes the configuration to <code>sdkconfig</code>.</p>
+
+    <figure class="term">
+      <img src="../assets/1723705777769.png" alt="A compact main menu: the title bar reads sdkconfig - Main Menu and lists HEX parameter, Three states, Subconfmenu, Subconfmenu2 and Save as">
+      <figcaption>mconf sdkconfig - Main Menu</figcaption>
+    </figure>
+
+    <h3>Command line (non-interactive)</h3>
+    <p><code>conf</code> shares the same parser as the menu UI, so it fits scripts and CI pipelines:</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Option</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--listnewconfig</code></td><td>List new options</td></tr>
+          <tr><td><code>--oldaskconfig</code></td><td>Start a new configuration using a line-oriented program</td></tr>
+          <tr><td><code>--oldconfig</code></td><td>Update a configuration using a provided <code>.config</code> as base</td></tr>
+          <tr><td><code>--silentoldconfig &lt;file&gt;</code></td><td>Same as <code>oldconfig</code>, but quietly; write header to <code>&lt;file&gt;</code></td></tr>
+          <tr><td><code>--olddefconfig</code></td><td>Same as <code>silentoldconfig</code> but sets new symbols to their default value</td></tr>
+          <tr><td><code>--oldnoconfig</code></td><td>An alias of <code>olddefconfig</code></td></tr>
+          <tr><td><code>--defconfig &lt;file&gt;</code></td><td>New config with default defined in <code>&lt;file&gt;</code></td></tr>
+          <tr><td><code>--savedefconfig &lt;file&gt;</code></td><td>Save the minimal current configuration to <code>&lt;file&gt;</code></td></tr>
+          <tr><td><code>--allnoconfig</code></td><td>New config where all options are answered with no</td></tr>
+          <tr><td><code>--allyesconfig</code></td><td>New config where all options are answered with yes</td></tr>
+          <tr><td><code>--allmodconfig</code></td><td>New config where all options are answered with mod</td></tr>
+          <tr><td><code>--alldefconfig</code></td><td>New config with all symbols set to default</td></tr>
+          <tr><td><code>--randconfig</code></td><td>New config with random answer to all options</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+<pre><span class="c">$</span> ./conf --alldefconfig test/rootconf
+configuration written to sdkconfig</pre>
+
+    <h3>The generated sdkconfig</h3>
+<pre><span class="c">#</span>
+<span class="c"># Automatically generated file; DO NOT EDIT.</span>
+<span class="c"># Main Menu</span>
+<span class="c">#</span>
+CONFIG_GEN_CHOICE1=y
+<span class="c"># CONFIG_GEN_CHOICE2 is not set</span>
+CONFIG_STRING_PARAM=""
+CONFIG_NUM_PARAM=0</pre>
+  </div>
+</section>
+
+<section id="cmake">
+  <div class="wrap">
+    <h2><span class="hash">#</span> Wiring it into CMake</h2>
+    <p>Read <code>sdkconfig</code> and turn each <code>CONFIG_*</code> into a compile definition (excerpt; the full version is in the <a href="https://github.com/luskyle/menuconfig/blob/main/README.md">README</a>):</p>
+<pre>file(STRINGS sdkconfig lines NEWLINE_CONSUME)
+string(REGEX MATCHALL "(CONFIG[a-zA-Z_0-9]+)=([a-zA-Z0-9\"]+)" result ${lines})
+
+foreach(line ${result})
+    string(REPLACE "=" ";" pv ${line})
+    list(GET pv 0 p)
+    list(GET pv 1 v)
+
+    if(v STREQUAL "y")
+        add_compile_definitions(${p})
+    else()
+        add_compile_definitions(${line})
+    endif()
+endforeach()</pre>
+  </div>
+</section>
+
+<section id="known-issues">
+  <div class="wrap">
+    <h2><span class="hash">#</span> Known issues</h2>
+    <ul>
+      <li>Input boxes (string parameters, <code>/</code> search, the <code>Save as</code> filename) do not accept typing or editing CJK text yet; <em>displaying</em> CJK is fine.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      Derived from the Linux kernel's <code>mconf</code>; upstream is Andreas Löscher's
+      <em>stand-alone mconf</em> (GPL-2.0+, Copyright © 2014).
+    </p>
+    <p>
+      <a href="https://github.com/luskyle/menuconfig">Source</a> ·
+      <a href="https://github.com/luskyle/menuconfig/releases">Releases</a> ·
+      <a href="https://github.com/luskyle/menuconfig/blob/main/README.en.md">README (English)</a> ·
+      <a href="https://github.com/luskyle/menuconfig/blob/main/LICENSE">LICENSE</a> ·
+      <a href="https://github.com/luskyle/menuconfig/blob/main/LICENCE.txt">Upstream license</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
