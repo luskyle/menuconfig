@@ -32,7 +32,7 @@ static void print_buttons(WINDOW * dialog, int height, int width, int selected)
 	int y = height - 2;
 
 	print_button(dialog, gettext("  Ok  "), y, x, selected == 0);
-	// print_button(dialog, gettext(" Help "), y, x + 14, selected == 1);
+	print_button(dialog, gettext(" Help "), y, x + 14, selected == 1);
 
 	wmove(dialog, y, x + 1 + 14 * selected);
 	wrefresh(dialog);
@@ -179,10 +179,10 @@ do_resize:
 		case KEY_UP:
 		case KEY_LEFT:
 			switch (button) {
-			// case -1:
-			// 	button = 1;	/* Indicates "Help" button is selected */
-			// 	print_buttons(dialog, height, width, 1);
-			// 	break;
+			case -1:
+				button = 1;	/* Indicates "Help" button is selected */
+				print_buttons(dialog, height, width, 1);
+				break;
 			case 0:
 				button = -1;	/* Indicates input box is selected */
 				print_buttons(dialog, height, width, 0);
@@ -203,10 +203,10 @@ do_resize:
 				button = 0;	/* Indicates "OK" button is selected */
 				print_buttons(dialog, height, width, 0);
 				break;
-			// case 0:
-			// 	button = 1;	/* Indicates "Help" button is selected */
-			// 	print_buttons(dialog, height, width, 1);
-			// 	break;
+			case 0:
+				button = 1;	/* Indicates "Help" button is selected */
+				print_buttons(dialog, height, width, 1);
+				break;
 			case 1:
 				button = -1;	/* Indicates input box is selected */
 				print_buttons(dialog, height, width, 0);

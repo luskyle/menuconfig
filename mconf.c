@@ -649,12 +649,12 @@ static void conf(struct menu *menu, struct menu *active_menu)
 				break;
 			}
 			break;
-		// case 2:
-		// 	if (sym)
-		// 		show_help(submenu);
-		// 	else
-		// 		show_helptext(_("README"), _(mconf_readme));
-		// 	break;
+		case 2:
+			if (sym)
+				show_help(submenu);
+			else
+				show_helptext(_("README"), _(mconf_readme));
+			break;
 		case 3:
 			if (item_is_tag('t')) {
 				if (sym_set_tristate_value(sym, yes))
@@ -762,14 +762,14 @@ static void conf_choice(struct menu *menu)
 				sym_set_tristate_value(child->sym, yes);
 			}
 			return;
-		// case 1:
-		// 	if (selected) {
-		// 		child = item_data();
-		// 		show_help(child);
-		// 		active = child->sym;
-		// 	} else
-		// 		show_help(menu);
-		// 	break;
+		case 1:
+			if (selected) {
+				child = item_data();
+				show_help(child);
+				active = child->sym;
+			} else
+				show_help(menu);
+			break;
 		case KEY_ESC:
 			return;
 		case -ERRDISPLAYTOOSMALL:

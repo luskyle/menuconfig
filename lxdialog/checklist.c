@@ -104,7 +104,7 @@ static void print_buttons(WINDOW * dialog, int height, int width, int selected)
 	int y = height - 2;
 
 	print_button(dialog, gettext("Select"), y, x, selected == 0);
-	// print_button(dialog, gettext(" Help "), y, x + 14, selected == 1);
+	print_button(dialog, gettext(" Help "), y, x + 14, selected == 1);
 	// print_button(dialog, gettext(" Exit "), y, x + 14, selected == 1);
 
 	wmove(dialog, y, x + 1 + 14 * selected);
@@ -306,11 +306,11 @@ do_resize:
 		case TAB:
 		case KEY_LEFT:
 		case KEY_RIGHT:
-			// button = ((key == KEY_LEFT ? --button : ++button) < 0)
-			//     ? 1 : (button > 1 ? 0 : button);
+			button = ((key == KEY_LEFT ? --button : ++button) < 0)
+			    ? 1 : (button > 1 ? 0 : button);
 
-			// print_buttons(dialog, height, width, button);
-			// wrefresh(dialog);
+			print_buttons(dialog, height, width, button);
+			wrefresh(dialog);
 			break;
 		case 'e':
 		case 'x':

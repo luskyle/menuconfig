@@ -159,7 +159,7 @@ static void print_buttons(WINDOW * win, int height, int width, int selected)
 
 	print_button(win, gettext("Select"), y, x, selected == 0);
 	print_button(win, gettext(" Exit "), y, x + 12, selected == 1);
-	// print_button(win, gettext(" Help "), y, x + 24, selected == 2);
+	print_button(win, gettext(" Help "), y, x + 24, selected == 2);
 
 	wmove(win, y, x + 1 + 12 * selected);
 	wrefresh(win);
