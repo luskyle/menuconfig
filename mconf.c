@@ -553,7 +553,7 @@ static void build_conf(struct menu *menu)
 				item_set_data(menu);
 				break;
 			default:
-				tmp = 2 + strlen(sym_get_string_value(sym)); /* () = 2 */
+				tmp = 2 + mb_width(sym_get_string_value(sym)); /* () = 2 */
 				item_make("(%s)", sym_get_string_value(sym));
 				tmp = indent - tmp + 4;
 				if (tmp < 0)
@@ -924,8 +924,9 @@ int main(int ac, char **av)
 	char *mode;
 	int res;
 
-	char* local = setlocale(LC_ALL, "");
-	printf("Locale after setting to '': %s\n", local);
+	/* 跟随环境 locale; 环境不可用时退回 UTF-8, 否则中文会被按字节转义 */
+	if (!setlocale(LC_ALL, ""))
+		setlocale(LC_ALL, "C.UTF-8");
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
 

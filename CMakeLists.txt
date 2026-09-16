@@ -2,20 +2,24 @@ cmake_minimum_required(VERSION 3.10)
 
 project(menuconfig LANGUAGES C)
 
-set(CURSES_NEED_NCURSES TRUE)
+# 宽字符版 ncursesw: 窄字符 ncurses 对 UTF-8 逐字节做 isprint 判断, 中文会被
+# 转义成 M-x 记号(乱码), 宽字符库才有多字节支持
+set(CURSES_NEED_WIDE TRUE)
 find_package(Curses REQUIRED)
 
-if (CURSES_HAVE_CURSES_H)
-   add_definitions(-DHAVE_CURSES_H=1)
+# 宽字符模式下 FindCurses 把 CURSES_HAVE_NCURSES_NCURSES_H / _CURSES_H 指向
+# ncursesw/ 下的头文件, 换成独立宏名, 与窄字符模式区分开
+if (CURSES_HAVE_NCURSES_NCURSES_H)
+   add_definitions(-DHAVE_NCURSESW_NCURSES_H=1)
+endif ()
+if (CURSES_HAVE_NCURSES_CURSES_H)
+   add_definitions(-DHAVE_NCURSESW_CURSES_H=1)
 endif ()
 if (CURSES_HAVE_NCURSES_H)
    add_definitions(-DHAVE_NCURSES_H=1)
 endif ()
-if (CURSES_HAVE_NCURSES_CURSES_H)
-   add_definitions(-DHAVE_NCURSES_CURSES_H=1)
-endif ()
-if (CURSES_HAVE_NCURSES_NCURSES_H)
-   add_definitions(-DHAVE_NCURSES_NCURSES_H=1)
+if (CURSES_HAVE_CURSES_H)
+   add_definitions(-DHAVE_CURSES_H=1)
 endif ()
 
 option(DEBUG "是否保留调试信息以便调试" ON)

@@ -31,10 +31,9 @@ static int list_width, check_x, item_x;
 static void print_item(WINDOW * win, int choice, int selected)
 {
 	int i;
-	char *list_item = malloc(list_width + 1);
+	char *list_item = malloc(list_width * 4 + 1);
 
-	strncpy(list_item, item_str(), list_width - item_x);
-	list_item[list_width - item_x] = '\0';
+	mb_truncate(list_item, list_width * 4 + 1, item_str(), list_width - item_x);
 
 	/* Clear 'residue' of last item */
 	wattrset(win, dlg.menubox.atr);
@@ -48,10 +47,16 @@ static void print_item(WINDOW * win, int choice, int selected)
 	if (!item_is_tag(':'))
 		wprintw(win, "(%c)", item_is_tag('X') ? 'X' : ' ');
 
-	wattrset(win, selected ? dlg.tag_selected.atr : dlg.tag.atr);
-	mvwaddch(win, choice, item_x, list_item[0]);
-	wattrset(win, selected ? dlg.item_selected.atr : dlg.item.atr);
-	waddstr(win, list_item + 1);
+	if ((unsigned char)list_item[0] < 0x80) {
+		wattrset(win, selected ? dlg.tag_selected.atr : dlg.tag.atr);
+		mvwaddch(win, choice, item_x, list_item[0]);
+		wattrset(win, selected ? dlg.item_selected.atr : dlg.item.atr);
+		waddstr(win, list_item + 1);
+	} else {
+		/* 首字符是多字节字符时不能按字节拆开, 整个串一起画 */
+		wattrset(win, selected ? dlg.item_selected.atr : dlg.item.atr);
+		mvwaddstr(win, choice, item_x, list_item);
+	}
 	if (selected) {
 		wmove(win, choice, check_x + 1);
 		wrefresh(win);
@@ -182,7 +187,7 @@ do_resize:
 	/* Find length of longest item in order to center checklist */
 	check_x = 0;
 	item_foreach()
-		check_x = MAX(check_x, strlen(item_str()) + 4);
+		check_x = MAX(check_x, mb_width(item_str()) + 4);
 	check_x = MIN(check_x, list_width);
 
 	check_x = (list_width - check_x) / 2;

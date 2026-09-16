@@ -340,13 +340,16 @@ static void print_page(WINDOW *win, int height, int width, update_text_fn
  */
 static void print_line(WINDOW * win, int row, int width)
 {
+	char buf[MAX_LEN + 1];
 	char *line;
 
 	line = get_line();
-	line += MIN(strlen(line), hscroll);	/* Scroll horizontally */
+	/* 按显示列宽水平滚动并截断, 避免切断多字节字符 */
+	line = (char *)mb_skip_cols(line, hscroll);
+	mb_truncate(buf, sizeof(buf), line, width - 2);
 	wmove(win, row, 0);	/* move cursor to correct line */
 	waddch(win, ' ');
-	waddnstr(win, line, MIN(strlen(line), width - 2));
+	waddstr(win, buf);
 
 	/* Clear 'residue' of previous line */
 #if OLD_NCURSES

@@ -32,7 +32,11 @@
 # define gettext(Msgid) ((const char *) (Msgid))
 #endif
 
-#if HAVE_NCURSES_NCURSES_H
+#if HAVE_NCURSESW_NCURSES_H
+# include <ncursesw/ncurses.h>
+#elif HAVE_NCURSESW_CURSES_H
+# include <ncursesw/curses.h>
+#elif HAVE_NCURSES_NCURSES_H
 # include <ncurses/ncurses.h>
 #elif HAVE_NCURSES_H
 # include <ncurses.h>
@@ -198,6 +202,10 @@ void draw_box(WINDOW * win, int y, int x, int height, int width, chtype box,
 void draw_shadow(WINDOW * win, int y, int x, int height, int width);
 
 int first_alpha(const char *string, const char *exempt);
+int mb_width(const char *s);
+int mb_width_n(const char *s, size_t nbytes);
+const char *mb_skip_cols(const char *s, int cols);
+void mb_truncate(char *dst, size_t dstsize, const char *src, int cols);
 int dialog_yesno(const char *title, const char *prompt, int height, int width);
 int dialog_msgbox(const char *title, const char *prompt, int height,
 		  int width, int pause);

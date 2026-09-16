@@ -491,7 +491,9 @@ int main(int ac, char **av)
 	const char *name, *defconfig_file = NULL /* gcc uninit */;
 	struct stat tmpstat;
 
-	setlocale(LC_ALL, "zh-CN");
+	/* 跟随环境 locale; "zh-CN" 不是合法 locale 名, 原来那句必然失败 */
+	if (!setlocale(LC_ALL, ""))
+		setlocale(LC_ALL, "C.UTF-8");
 	bindtextdomain(PACKAGE, LOCALEDIR);
 	textdomain(PACKAGE);
 

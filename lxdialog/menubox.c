@@ -67,10 +67,9 @@ static void do_print_item(WINDOW * win, const char *item, int line_y,
                           int selected, int hotkey)
 {
 	int j;
-	char *menu_item = malloc(menu_width + 1);
+	char *menu_item = malloc(menu_width * 4 + 1);
 
-	strncpy(menu_item, item, menu_width - item_x);
-	menu_item[menu_width - item_x] = '\0';
+	mb_truncate(menu_item, menu_width * 4 + 1, item, menu_width - item_x);
 	j = first_alpha(menu_item, "YyNnMmHh");
 
 	/* Clear 'residue' of last item */
@@ -87,10 +86,11 @@ static void do_print_item(WINDOW * win, const char *item, int line_y,
 #endif
 	wattrset(win, selected ? dlg.item_selected.atr : dlg.item.atr);
 	mvwaddstr(win, line_y, item_x, menu_item);
-	if (hotkey) {
+	if (hotkey && (unsigned char)menu_item[j] < 0x80) {
 		wattrset(win, selected ? dlg.tag_key_selected.atr
 			 : dlg.tag_key.atr);
-		mvwaddch(win, line_y, item_x + j, menu_item[j]);
+		mvwaddch(win, line_y, item_x + mb_width_n(menu_item, j),
+			 menu_item[j]);
 	}
 	if (selected) {
 		wmove(win, line_y, item_x + 1);

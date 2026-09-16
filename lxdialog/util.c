@@ -19,7 +19,11 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+/* wcwidth() 需要 XSI 特性宏才在 <wchar.h> 里声明 */
+#define _XOPEN_SOURCE 700
+
 #include <stdarg.h>
+#include <wchar.h>
 
 #include "dialog.h"
 
@@ -316,13 +320,140 @@ void end_dialog(int x, int y)
 /* Print the title of the dialog. Center the title and truncate
  * tile if wider than dialog (- 2 chars).
  **/
+/*
+ * 多字节字符串的显示列宽: CJK 等宽字符按 2 列计.
+ * 非多字节 locale 下退回按字节计.
+ */
+int mb_width(const char *s)
+{
+	return mb_width_n(s, strlen(s));
+}
+
+/*
+ * 前 nbytes 个字节的显示列宽, 用于把字节偏移换算成列偏移.
+ */
+int mb_width_n(const char *s, size_t nbytes)
+{
+	int cols = 0;
+	mbstate_t st;
+	const char *p = s, *end = s + nbytes;
+
+	if (MB_CUR_MAX == 1)
+		return (int)nbytes;
+
+	memset(&st, 0, sizeof(st));
+	while (p < end) {
+		wchar_t wc;
+		size_t n = mbrtowc(&wc, p, end - p, &st);
+		int w;
+
+		if (n == (size_t)-1 || n == (size_t)-2) {
+			memset(&st, 0, sizeof(st));
+			n = 1;
+			w = 1;
+		} else if (n == 0) {
+			break;
+		} else {
+			w = wcwidth(wc);
+			if (w < 0)
+				w = 1;
+		}
+		cols += w;
+		p += n;
+	}
+	return cols;
+}
+
+/*
+ * 跳过开头的 cols 列, 返回剩余部分的起点(不切断多字节字符).
+ */
+const char *mb_skip_cols(const char *s, int cols)
+{
+	mbstate_t st;
+	const char *p = s;
+	int seen = 0;
+
+	if (cols <= 0)
+		return s;
+	if (MB_CUR_MAX == 1)
+		return s + MIN((size_t)cols, strlen(s));
+
+	memset(&st, 0, sizeof(st));
+	while (*p && seen < cols) {
+		wchar_t wc;
+		size_t n = mbrtowc(&wc, p, MB_CUR_MAX, &st);
+		int w;
+
+		if (n == (size_t)-1 || n == (size_t)-2) {
+			memset(&st, 0, sizeof(st));
+			n = 1;
+			w = 1;
+		} else if (n == 0) {
+			break;
+		} else {
+			w = wcwidth(wc);
+			if (w < 0)
+				w = 1;
+		}
+		seen += w;
+		p += n;
+	}
+	return p;
+}
+
+/*
+ * 按显示列宽把 src 裁剪到最多 cols 列, 不切断多字节字符.
+ */
+void mb_truncate(char *dst, size_t dstsize, const char *src, int cols)
+{
+	size_t used = 0;
+	int used_cols = 0;
+	mbstate_t st;
+	const char *p = src;
+
+	if (dstsize == 0)
+		return;
+	memset(&st, 0, sizeof(st));
+	while (*p && used + 1 < dstsize) {
+		wchar_t wc;
+		size_t n = mbrtowc(&wc, p, MB_CUR_MAX, &st);
+		int w;
+
+		if (n == (size_t)-1 || n == (size_t)-2) {
+			memset(&st, 0, sizeof(st));
+			n = 1;
+			w = 1;
+		} else if (n == 0) {
+			break;
+		} else {
+			w = wcwidth(wc);
+			if (w < 0)
+				w = 1;
+		}
+		if (used_cols + w > cols || used + n + 1 > dstsize)
+			break;
+		memcpy(dst + used, p, n);
+		used += n;
+		used_cols += w;
+		p += n;
+	}
+	dst[used] = '\0';
+}
+
 void print_title(WINDOW *dialog, const char *title, int width)
 {
 	if (title) {
-		int tlen = MIN(width - 2, strlen(title));
+		char buf[MAX_LEN + 1];
+		int tlen = mb_width(title);
+
+		if (tlen > width - 2) {
+			mb_truncate(buf, sizeof(buf), title, width - 2);
+			title = buf;
+			tlen = width - 2;
+		}
 		wattrset(dialog, dlg.title.atr);
 		mvwaddch(dialog, 0, (width - tlen) / 2 - 1, ' ');
-		mvwaddnstr(dialog, 0, (width - tlen)/2, title, tlen);
+		mvwaddstr(dialog, 0, (width - tlen)/2, title);
 		waddch(dialog, ' ');
 	}
 }
@@ -336,20 +467,22 @@ void print_title(WINDOW *dialog, const char *title, int width)
 void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
 {
 	int newl, cur_x, cur_y;
-	int i, prompt_len, room, wlen;
+	int i, blen, prompt_len, room, wlen;
 	char tempstr[MAX_LEN + 1], *word, *sp, *sp2;
 
 	strcpy(tempstr, prompt);
 
-	prompt_len = strlen(tempstr);
+	blen = strlen(tempstr);
 
 	/*
 	 * Remove newlines
 	 */
-	for (i = 0; i < prompt_len; i++) {
+	for (i = 0; i < blen; i++) {
 		if (tempstr[i] == '\n')
 			tempstr[i] = ' ';
 	}
+
+	prompt_len = mb_width(tempstr);
 
 	if (prompt_len <= width - x * 2) {	/* If prompt is short */
 		wmove(win, y, (width - prompt_len) / 2);
@@ -368,12 +501,12 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
 			   or it is the first word of a new sentence, and it is
 			   short, and the next word does not fit. */
 			room = width - cur_x;
-			wlen = strlen(word);
+			wlen = mb_width(word);
 			if (wlen > room ||
 			    (newl && wlen < 4 && sp
-			     && wlen + 1 + strlen(sp) > room
+			     && wlen + 1 + mb_width(sp) > room
 			     && (!(sp2 = strchr(sp, ' '))
-				 || wlen + 1 + (sp2 - sp) > room))) {
+				 || wlen + 1 + mb_width_n(sp, sp2 - sp) > room))) {
 				cur_y++;
 				cur_x = x;
 			}
