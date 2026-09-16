@@ -60,7 +60,7 @@ sh install.sh   # 构建后把 mconf 复制到 /bin, 需要写 /bin 的权限
 ## 下载
 
 不想自己编译的话, 从 [Releases](https://github.com/luskyle/menuconfig-plusplus/releases/latest) 下载
-`menuconfig-<版本>-linux-x86_64.tar.gz`, 解包后即为 `mconf` 与 `conf` 两个可执行文件.
+`menuconfig-plusplus-<版本>-linux-x86_64.tar.gz`, 解包后即为 `mconf` 与 `conf` 两个可执行文件.
 
 ## 测试
 

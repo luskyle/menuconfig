@@ -60,7 +60,7 @@ sh install.sh   # build, then copy mconf into /bin (needs write access there)
 
 ## Download
 
-If you would rather not build it yourself, grab `menuconfig-<version>-linux-x86_64.tar.gz`
+If you would rather not build it yourself, grab `menuconfig-plusplus-<version>-linux-x86_64.tar.gz`
 from [Releases](https://github.com/luskyle/menuconfig-plusplus/releases/latest); it unpacks to the
 `mconf` and `conf` executables.
 

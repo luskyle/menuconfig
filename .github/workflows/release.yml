@@ -36,7 +36,7 @@ jobs:
       - name: 打包
         run: |
           VER="${GITHUB_REF_NAME#v}"
-          STAGE="menuconfig-${VER}"
+          STAGE="menuconfig-plusplus-${VER}"
           mkdir -p "dist/${STAGE}"
           cp build/mconf build/conf "dist/${STAGE}/"
           cp README.md README.en.md LICENSE "dist/${STAGE}/"
@@ -48,9 +48,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VER="${GITHUB_REF_NAME#v}"
+          STAGE="menuconfig-plusplus-${VER}"
           ASSETS=(
-            "menuconfig-${VER}-linux-x86_64.tar.gz"
-            "menuconfig-${VER}-linux-x86_64.tar.gz.sha256"
+            "${STAGE}-linux-x86_64.tar.gz"
+            "${STAGE}-linux-x86_64.tar.gz.sha256"
           )
           # 优先用仓库里写好的详细说明, 找不到再退回按提交自动生成
           if [ -f "release-notes/${GITHUB_REF_NAME}.md" ]; then
