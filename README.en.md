@@ -1,7 +1,7 @@
 menuconfig++
 ============
 
-[English](README.en.md) | **简体中文** ([README.md](README.md))
+**English** | [简体中文](README.md)
 
 [![CI](https://github.com/luskyle/menuconfig/actions/workflows/ci.yml/badge.svg)](https://github.com/luskyle/menuconfig/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/luskyle/menuconfig?label=release)](https://github.com/luskyle/menuconfig/releases/latest)
