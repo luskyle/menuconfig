@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: 打包并发布 ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libncurses-dev ninja-build
+
+      - name: 配置（Release）
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: 构建
+        run: cmake --build build
+
+      - name: 回归测试（conf 非交互）
+        run: |
+          mkdir -p /tmp/smoke
+          cd /tmp/smoke
+          "$GITHUB_WORKSPACE/build/conf" --alldefconfig "$GITHUB_WORKSPACE/test/rootconf"
+          test -s sdkconfig
+          grep -q 'CONFIG_GEN_CHOICE1=y' sdkconfig
+
+      - name: 打包
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          STAGE="menuconfig-${VER}"
+          mkdir -p "dist/${STAGE}"
+          cp build/mconf build/conf "dist/${STAGE}/"
+          cp README.md LICENSE "dist/${STAGE}/"
+          tar -C dist -czf "${STAGE}-linux-x86_64.tar.gz" "${STAGE}"
+          sha256sum "${STAGE}-linux-x86_64.tar.gz" > "${STAGE}-linux-x86_64.tar.gz.sha256"
+
+      - name: 创建 GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          gh release create "${GITHUB_REF_NAME}" \
+            "menuconfig-${VER}-linux-x86_64.tar.gz" \
+            "menuconfig-${VER}-linux-x86_64.tar.gz.sha256" \
+            --title "menuconfig ${VER}" \
+            --generate-notes

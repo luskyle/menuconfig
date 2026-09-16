@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 构建 + 回归（${{ matrix.name }}）
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: 默认 Debug
+            args: ""
+            expect: "DEBUG=ON, CMAKE_BUILD_TYPE=Debug"
+          - name: Release
+            args: "-DCMAKE_BUILD_TYPE=Release"
+            expect: "DEBUG=ON, CMAKE_BUILD_TYPE=Release"
+          - name: DEBUG 关闭
+            args: "-DDEBUG=OFF"
+            expect: "DEBUG=OFF, CMAKE_BUILD_TYPE=Release"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libncurses-dev ninja-build
+
+      - name: 配置
+        run: |
+          set -o pipefail
+          cmake -S . -B build -G Ninja ${{ matrix.args }} | tee cmake.log
+          grep -F -- "-- ${{ matrix.expect }}" cmake.log
+
+      - name: 构建
+        run: cmake --build build
+
+      - name: 回归测试（conf 非交互）
+        run: |
+          mkdir -p /tmp/smoke
+          cd /tmp/smoke
+          "$GITHUB_WORKSPACE/build/conf" --alldefconfig "$GITHUB_WORKSPACE/test/rootconf"
+          test -s sdkconfig
+          grep -q 'CONFIG_GEN_CHOICE1=y' sdkconfig
+          grep -q '这是一段注释' sdkconfig
+          grep -q 'Subconfmenu2' sdkconfig
+          echo "回归通过"
