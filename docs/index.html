@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>menuconfig — 图形化生成项目宏配置</title>
+<meta name="description" content="源自 Linux 内核 kconfig/mconf 的独立配置工具，用于图形化生成项目宏配置，输出可被 CMake 直接读取的 sdkconfig。">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f6f8fa;
+    --fg: #1f2328;
+    --fg-muted: #59636e;
+    --border: #d1d9e0;
+    --accent: #0969da;
+    --accent-soft: #ddf4ff;
+    --term-bg: #161b22;
+    --term-fg: #e6edf3;
+    --term-accent: #7ee787;
+    --radius: 10px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117;
+      --bg-soft: #151b23;
+      --fg: #e6edf3;
+      --fg-muted: #9198a1;
+      --border: #30363d;
+      --accent: #4493f8;
+      --accent-soft: #121d2f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", Helvetica, Arial, sans-serif;
+  }
+  a { color: var(--accent); }
+  code, pre { font-family: var(--mono); font-size: 0.875em; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 20px; }
+
+  nav {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky; top: 0; z-index: 10;
+  }
+  nav .wrap {
+    display: flex; align-items: center; gap: 18px;
+    height: 56px; flex-wrap: wrap;
+  }
+  nav .brand { font-family: var(--mono); font-weight: 600; margin-right: auto; }
+  nav a.plain { color: var(--fg-muted); text-decoration: none; font-size: 14px; }
+  nav a.plain:hover { color: var(--accent); }
+
+  header.hero { padding: 56px 0 40px; }
+  header.hero h1 {
+    font-family: var(--mono);
+    font-size: clamp(30px, 5vw, 46px);
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+  }
+  header.hero p.lead {
+    font-size: 18px; color: var(--fg-muted); margin: 0 0 24px; max-width: 42em;
+  }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .badges img { display: block; height: 20px; }
+  .btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 10px 18px; border-radius: 8px;
+    text-decoration: none; font-weight: 600; font-size: 15px;
+    border: 1px solid var(--border);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.1); }
+  .btn.ghost { color: var(--fg); background: var(--bg-soft); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  figure.term {
+    margin: 36px 0 0; padding: 14px;
+    background: var(--term-bg); border-radius: var(--radius);
+    box-shadow: 0 8px 28px rgba(0,0,0,.22);
+  }
+  figure.term::before {
+    content: ""; display: block; height: 10px; margin-bottom: 10px;
+    background:
+      radial-gradient(circle at 6px 5px, #ff5f57 5px, transparent 5.5px),
+      radial-gradient(circle at 24px 5px, #febc2e 5px, transparent 5.5px),
+      radial-gradient(circle at 42px 5px, #28c840 5px, transparent 5.5px);
+  }
+  figure.term img { display: block; width: 100%; height: auto; border-radius: 6px; }
+  figure.term figcaption {
+    color: #9198a1; font-size: 13px; font-family: var(--mono);
+    padding: 10px 4px 0; text-align: center;
+  }
+
+  section { padding: 44px 0; border-top: 1px solid var(--border); }
+  section h2 { font-size: 22px; margin: 0 0 22px; }
+  section h2 .hash { color: var(--fg-muted); font-family: var(--mono); font-weight: 400; }
+
+  ul.features { list-style: none; padding: 0; margin: 0;
+    display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  ul.features li {
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 18px;
+  }
+  ul.features strong { display: block; margin-bottom: 6px; font-size: 15px; }
+  ul.features span { color: var(--fg-muted); font-size: 14px; }
+
+  pre {
+    background: var(--term-bg); color: var(--term-fg);
+    padding: 16px 18px; border-radius: var(--radius);
+    overflow-x: auto; line-height: 1.6; margin: 0 0 14px;
+  }
+  pre .c { color: var(--term-accent); }
+  pre .p { color: #79c0ff; }
+  p code, li code, td code, h3 code {
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 5px; padding: 1px 5px;
+  }
+  h3 { font-size: 16px; margin: 26px 0 10px; }
+  h3:first-of-type { margin-top: 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  th { color: var(--fg-muted); font-weight: 600; white-space: nowrap; }
+  td:first-child { white-space: nowrap; }
+  .tbl-wrap { overflow-x: auto; }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 14.5px; color: var(--fg);
+  }
+
+  footer {
+    border-top: 1px solid var(--border); padding: 28px 0 44px;
+    color: var(--fg-muted); font-size: 14px;
+  }
+  footer p { margin: 0 0 8px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <span class="brand">menuconfig</span>
+    <a class="plain" href="#features">特性</a>
+    <a class="plain" href="#install">安装</a>
+    <a class="plain" href="#usage">使用</a>
+    <a class="plain" href="#cmake">接入 CMake</a>
+    <a class="plain" href="https://github.com/luskyle/menuconfig">GitHub</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>menuconfig</h1>
+    <p class="lead">
+      源自 Linux 内核 <code>kconfig</code> / <code>mconf</code> 的独立配置工具。
+      用熟悉的图形菜单配置项目宏，生成 <code>sdkconfig</code>，可直接被 CMake 读取为编译宏。
+    </p>
+
+    <div class="badges">
+      <a href="https://github.com/luskyle/menuconfig/actions/workflows/ci.yml">
+        <img src="https://github.com/luskyle/menuconfig/actions/workflows/ci.yml/badge.svg" alt="CI 状态">
+      </a>
+      <a href="https://github.com/luskyle/menuconfig/releases/latest">
+        <img src="https://img.shields.io/github/v/release/luskyle/menuconfig?label=release" alt="最新版本">
+      </a>
+      <img src="https://img.shields.io/badge/platform-linux-x86__64-informational" alt="平台：linux-x86_64">
+    </div>
+
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/luskyle/menuconfig/releases/latest">下载最新版本</a>
+      <a class="btn ghost" href="https://github.com/luskyle/menuconfig">查看源码</a>
+    </div>
+
+    <figure class="term">
+      <img src="assets/1723619417014.png" alt="menuconfig 的主菜单界面：顶部标题栏显示 .config - Main Menu，中间是可导航的配置项列表，底部是 Select / Exit / Help 按钮">
+      <figcaption>mconf .config - Main Menu</figcaption>
+    </figure>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <h2><span class="hash">#</span> 特性</h2>
+    <ul class="features">
+      <li>
+        <strong>内核同款 TUI</strong>
+        <span>方向键导航、热键跳转、<code>&lt;Y&gt;/&lt;N&gt;/&lt;M&gt;</code> 选择、<code>?</code> 帮助、<code>/</code> 搜索，和 Linux 内核 <code>menuconfig</code> 操作习惯一致。</span>
+      </li>
+      <li>
+        <strong>完整的 kconfig 语义</strong>
+        <span>支持 <code>bool</code> / <code>tristate</code> / <code>int</code> / <code>hex</code> / <code>string</code>、<code>choice</code>、<code>depends on</code>、<code>select</code>、多层子菜单与 <code>source</code> 文件包含。</span>
+      </li>
+      <li>
+        <strong>输出可直接进构建</strong>
+        <span>生成 <code>sdkconfig</code>（<code>CONFIG_XXX=y</code> 形式），CMake 正则解析后 <code>add_compile_definitions</code> 即可使用。</span>
+      </li>
+      <li>
+        <strong>非交互模式，能进 CI</strong>
+        <span><code>conf</code> 支持 <code>--olddefconfig</code> / <code>--defconfig</code> / <code>--savedefconfig</code> / <code>--allyesconfig</code> 等批处理模式，适合脚本和流水线。</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <h2><span class="hash">#</span> 安装</h2>
+
+    <h3>方式一：下载预编译二进制</h3>
+    <p>从 <a href="https://github.com/luskyle/menuconfig/releases/latest">Releases</a> 下载 <code>menuconfig-&lt;版本&gt;-linux-x86_64.tar.gz</code>，解包后包含 <code>mconf</code>（图形界面）和 <code>conf</code>（命令行）：</p>
+<pre><span class="c">$</span> tar -xzf menuconfig-*-linux-x86_64.tar.gz
+<span class="c">$</span> cd menuconfig-*
+<span class="c">$</span> ./mconf test/rootconf</pre>
+
+    <h3>方式二：从源码构建</h3>
+    <p>依赖只有 C 编译器和 ncurses 开发库：</p>
+<pre><span class="c">#</span> Debian / Ubuntu
+<span class="c">$</span> sudo apt install -y libncurses-dev cmake ninja-build
+
+<span class="c">$</span> git clone https://github.com/luskyle/menuconfig.git
+<span class="c">$</span> cd menuconfig
+<span class="c">$</span> cmake -S . -B build -G Ninja
+<span class="c">$</span> cmake --build build</pre>
+    <div class="note">
+      构建类型由 <code>-DDEBUG</code> 与 <code>-DCMAKE_BUILD_TYPE</code> 控制：
+      默认 <code>DEBUG=ON</code> 生成带调试信息的 Debug 构建，<code>-DDEBUG=OFF</code> 则为 Release；
+      显式传入 <code>-DCMAKE_BUILD_TYPE=Release</code> 时以你的指定为准。
+    </div>
+  </div>
+</section>
+
+<section id="usage">
+  <div class="wrap">
+    <h2><span class="hash">#</span> 使用</h2>
+
+    <h3>图形界面</h3>
+<pre><span class="c">$</span> ./mconf test/rootconf</pre>
+    <p>把 <code>test/rootconf</code> 换成你自己的 kconfig 入口文件即可。退出时选择保存，配置写入 <code>sdkconfig</code>。</p>
+
+    <figure class="term">
+      <img src="assets/1723705777769.png" alt="简化后的主菜单界面：顶部显示 sdkconfig - Main Menu，列出 HEX parameter、Three states、Subconfmenu、Subconfmenu2 与 Save as">
+      <figcaption>mconf sdkconfig - Main Menu</figcaption>
+    </figure>
+
+    <h3>命令行（非交互）</h3>
+    <p><code>conf</code> 与图形界面共用同一套解析逻辑，适合放进脚本或 CI：</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>选项</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>--oldaskconfig</code></td><td>以行式问答方式新建配置</td></tr>
+          <tr><td><code>--oldconfig</code></td><td>以已有 <code>.config</code> 为基线更新配置</td></tr>
+          <tr><td><code>--silentoldconfig &lt;file&gt;</code></td><td>同 <code>--oldconfig</code> 但静默，并把头写入 <code>&lt;file&gt;</code></td></tr>
+          <tr><td><code>--olddefconfig</code></td><td>静默更新，新符号取默认值</td></tr>
+          <tr><td><code>--defconfig &lt;file&gt;</code></td><td>用 <code>&lt;file&gt;</code> 中定义的默认值生成新配置</td></tr>
+          <tr><td><code>--savedefconfig &lt;file&gt;</code></td><td>把当前配置的最小集保存到 <code>&lt;file&gt;</code></td></tr>
+          <tr><td><code>--allnoconfig</code></td><td>全部选项取 <code>n</code></td></tr>
+          <tr><td><code>--allyesconfig</code></td><td>全部选项取 <code>y</code></td></tr>
+          <tr><td><code>--allmodconfig</code></td><td>全部选项取 <code>m</code></td></tr>
+          <tr><td><code>--alldefconfig</code></td><td>全部符号取默认值</td></tr>
+          <tr><td><code>--randconfig</code></td><td>随机应答所有选项</td></tr>
+          <tr><td><code>--listnewconfig</code></td><td>列出新增选项</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+<pre><span class="c">$</span> ./conf --alldefconfig test/rootconf
+configuration written to sdkconfig</pre>
+
+    <h3>生成的 sdkconfig</h3>
+<pre><span class="c">#</span>
+<span class="c"># Automatically generated file; DO NOT EDIT.</span>
+<span class="c"># Main Menu</span>
+<span class="c">#</span>
+CONFIG_GEN_CHOICE1=y
+<span class="c"># CONFIG_GEN_CHOICE2 is not set</span>
+CONFIG_STRING_PARAM=""
+CONFIG_NUM_PARAM=0</pre>
+  </div>
+</section>
+
+<section id="cmake">
+  <div class="wrap">
+    <h2><span class="hash">#</span> 接入 CMake</h2>
+    <p>读取 <code>sdkconfig</code> 并把 <code>CONFIG_*</code> 转成编译宏（节选，完整版见 <a href="https://github.com/luskyle/menuconfig/blob/main/README.md">README</a>）：</p>
+<pre>file(STRINGS sdkconfig lines NEWLINE_CONSUME)
+string(REGEX MATCHALL "(CONFIG[a-zA-Z_0-9]+)=([a-zA-Z0-9\"]+)" result ${lines})
+
+foreach(line ${result})
+    string(REPLACE "=" ";" pv ${line})
+    list(GET pv 0 p)
+    list(GET pv 1 v)
+
+    if(v STREQUAL "y")
+        add_compile_definitions(${p})
+    else()
+        add_compile_definitions(${line})
+    endif()
+endforeach()</pre>
+  </div>
+</section>
+
+<section id="known-issues">
+  <div class="wrap">
+    <h2><span class="hash">#</span> 已知问题</h2>
+    <ul>
+      <li>中文配置项的界面展示仍有排版问题（详见仓库 README 的 TODO）。</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      源自 Linux 内核 <code>mconf</code>，上游为 Andreas Löscher 的
+      <em>stand-alone mconf</em>（GPL-2.0+，Copyright © 2014）。
+    </p>
+    <p>
+      <a href="https://github.com/luskyle/menuconfig">源码</a> ·
+      <a href="https://github.com/luskyle/menuconfig/releases">发布记录</a> ·
+      <a href="https://github.com/luskyle/menuconfig/blob/main/README.md">README</a> ·
+      <a href="https://github.com/luskyle/menuconfig/blob/main/LICENSE">LICENSE</a> ·
+      <a href="https://github.com/luskyle/menuconfig/blob/main/LICENCE.txt">上游许可</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
