@@ -3,14 +3,14 @@ menuconfig++
 
 **English** | [简体中文](README.md)
 
-[![CI](https://github.com/luskyle/menuconfig/actions/workflows/ci.yml/badge.svg)](https://github.com/luskyle/menuconfig/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/luskyle/menuconfig?label=release)](https://github.com/luskyle/menuconfig/releases/latest)
+[![CI](https://github.com/luskyle/menuconfig-plusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/luskyle/menuconfig-plusplus/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/luskyle/menuconfig-plusplus?label=release)](https://github.com/luskyle/menuconfig-plusplus/releases/latest)
 ![Platform](https://img.shields.io/badge/platform-linux--x86__64-informational)
 
 A configuration tool built on the Linux kernel's `mconf`, reworked and extended.
 It gives your project a menu UI for its build-time macros.
 
-Project page: [https://luskyle.github.io/menuconfig/](https://luskyle.github.io/menuconfig/)
+Project page: [https://luskyle.github.io/menuconfig-plusplus/](https://luskyle.github.io/menuconfig-plusplus/)
 
 ![Main menu](image/README/1723619417014.png)
 
@@ -61,7 +61,7 @@ sh install.sh   # build, then copy mconf into /bin (needs write access there)
 ## Download
 
 If you would rather not build it yourself, grab `menuconfig-<version>-linux-x86_64.tar.gz`
-from [Releases](https://github.com/luskyle/menuconfig/releases/latest); it unpacks to the
+from [Releases](https://github.com/luskyle/menuconfig-plusplus/releases/latest); it unpacks to the
 `mconf` and `conf` executables.
 
 ## Testing

@@ -16,7 +16,7 @@
     <a class="plain" href="#install">Install</a>
     <a class="plain" href="#usage">Usage</a>
     <a class="plain" href="#cmake">CMake</a>
-    <a class="plain" href="https://github.com/luskyle/menuconfig">GitHub</a>
+    <a class="plain" href="https://github.com/luskyle/menuconfig-plusplus">GitHub</a>
     <a class="plain lang" href="../">简体中文</a>
   </div>
 </nav>
@@ -31,18 +31,18 @@
     </p>
 
     <div class="badges">
-      <a href="https://github.com/luskyle/menuconfig/actions/workflows/ci.yml">
-        <img src="https://github.com/luskyle/menuconfig/actions/workflows/ci.yml/badge.svg" alt="CI status">
+      <a href="https://github.com/luskyle/menuconfig-plusplus/actions/workflows/ci.yml">
+        <img src="https://github.com/luskyle/menuconfig-plusplus/actions/workflows/ci.yml/badge.svg" alt="CI status">
       </a>
-      <a href="https://github.com/luskyle/menuconfig/releases/latest">
-        <img src="https://img.shields.io/github/v/release/luskyle/menuconfig?label=release" alt="Latest release">
+      <a href="https://github.com/luskyle/menuconfig-plusplus/releases/latest">
+        <img src="https://img.shields.io/github/v/release/luskyle/menuconfig-plusplus?label=release" alt="Latest release">
       </a>
       <img src="https://img.shields.io/badge/platform-linux-x86__64-informational" alt="Platform: linux-x86_64">
     </div>
 
     <div class="btns">
-      <a class="btn primary" href="https://github.com/luskyle/menuconfig/releases/latest">Download latest</a>
-      <a class="btn ghost" href="https://github.com/luskyle/menuconfig">View source</a>
+      <a class="btn primary" href="https://github.com/luskyle/menuconfig-plusplus/releases/latest">Download latest</a>
+      <a class="btn ghost" href="https://github.com/luskyle/menuconfig-plusplus">View source</a>
     </div>
 
     <figure class="term">
@@ -85,7 +85,7 @@
     <h2><span class="hash">#</span> Install</h2>
 
     <h3>Option 1: prebuilt binary</h3>
-    <p>Grab <code>menuconfig-&lt;version&gt;-linux-x86_64.tar.gz</code> from <a href="https://github.com/luskyle/menuconfig/releases/latest">Releases</a>. It unpacks to <code>mconf</code> (menu UI) and <code>conf</code> (command line):</p>
+    <p>Grab <code>menuconfig-&lt;version&gt;-linux-x86_64.tar.gz</code> from <a href="https://github.com/luskyle/menuconfig-plusplus/releases/latest">Releases</a>. It unpacks to <code>mconf</code> (menu UI) and <code>conf</code> (command line):</p>
 <pre><span class="c">$</span> tar -xzf menuconfig-*-linux-x86_64.tar.gz
 <span class="c">$</span> cd menuconfig-*
 <span class="c">$</span> ./mconf test/rootconf</pre>
@@ -95,8 +95,8 @@
 <pre><span class="c">#</span> Debian / Ubuntu
 <span class="c">$</span> sudo apt install -y libncurses-dev cmake ninja-build
 
-<span class="c">$</span> git clone https://github.com/luskyle/menuconfig.git
-<span class="c">$</span> cd menuconfig
+<span class="c">$</span> git clone https://github.com/luskyle/menuconfig-plusplus.git
+<span class="c">$</span> cd menuconfig-plusplus
 <span class="c">$</span> cmake -S . -B build -G Ninja
 <span class="c">$</span> cmake --build build</pre>
     <div class="note">
@@ -161,7 +161,7 @@ CONFIG_NUM_PARAM=0</pre>
 <section id="cmake">
   <div class="wrap">
     <h2><span class="hash">#</span> Wiring it into CMake</h2>
-    <p>Read <code>sdkconfig</code> and turn each <code>CONFIG_*</code> into a compile definition (excerpt; the full version is in the <a href="https://github.com/luskyle/menuconfig/blob/main/README.md">README</a>):</p>
+    <p>Read <code>sdkconfig</code> and turn each <code>CONFIG_*</code> into a compile definition (excerpt; the full version is in the <a href="https://github.com/luskyle/menuconfig-plusplus/blob/main/README.md">README</a>):</p>
 <pre>file(STRINGS sdkconfig lines NEWLINE_CONSUME)
 string(REGEX MATCHALL "(CONFIG[a-zA-Z_0-9]+)=([a-zA-Z0-9\"]+)" result ${lines})
 
@@ -195,11 +195,11 @@ endforeach()</pre>
       <em>stand-alone mconf</em> (GPL-2.0+, Copyright © 2014).
     </p>
     <p>
-      <a href="https://github.com/luskyle/menuconfig">Source</a> ·
-      <a href="https://github.com/luskyle/menuconfig/releases">Releases</a> ·
-      <a href="https://github.com/luskyle/menuconfig/blob/main/README.en.md">README (English)</a> ·
-      <a href="https://github.com/luskyle/menuconfig/blob/main/LICENSE">LICENSE</a> ·
-      <a href="https://github.com/luskyle/menuconfig/blob/main/LICENCE.txt">Upstream license</a>
+      <a href="https://github.com/luskyle/menuconfig-plusplus">Source</a> ·
+      <a href="https://github.com/luskyle/menuconfig-plusplus/releases">Releases</a> ·
+      <a href="https://github.com/luskyle/menuconfig-plusplus/blob/main/README.en.md">README (English)</a> ·
+      <a href="https://github.com/luskyle/menuconfig-plusplus/blob/main/LICENSE">LICENSE</a> ·
+      <a href="https://github.com/luskyle/menuconfig-plusplus/blob/main/LICENCE.txt">Upstream license</a>
     </p>
   </div>
 </footer>

@@ -3,13 +3,13 @@ menuconfig++
 
 **简体中文** | [English](README.en.md)
 
-[![CI](https://github.com/luskyle/menuconfig/actions/workflows/ci.yml/badge.svg)](https://github.com/luskyle/menuconfig/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/luskyle/menuconfig?label=release)](https://github.com/luskyle/menuconfig/releases/latest)
+[![CI](https://github.com/luskyle/menuconfig-plusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/luskyle/menuconfig-plusplus/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/luskyle/menuconfig-plusplus?label=release)](https://github.com/luskyle/menuconfig-plusplus/releases/latest)
 ![Platform](https://img.shields.io/badge/platform-linux--x86__64-informational)
 
 从 linux kernel 源码中的 mconf 工具优化改造而来。用于图形化生成项目宏配置。
 
-在线主页: [https://luskyle.github.io/menuconfig/](https://luskyle.github.io/menuconfig/)
+在线主页: [https://luskyle.github.io/menuconfig-plusplus/](https://luskyle.github.io/menuconfig-plusplus/)
 
 ![主菜单](image/README/1723619417014.png)
 
@@ -59,7 +59,7 @@ sh install.sh   # 构建后把 mconf 复制到 /bin, 需要写 /bin 的权限
 
 ## 下载
 
-不想自己编译的话, 从 [Releases](https://github.com/luskyle/menuconfig/releases/latest) 下载
+不想自己编译的话, 从 [Releases](https://github.com/luskyle/menuconfig-plusplus/releases/latest) 下载
 `menuconfig-<版本>-linux-x86_64.tar.gz`, 解包后即为 `mconf` 与 `conf` 两个可执行文件.
 
 ## 测试

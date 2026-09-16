@@ -16,7 +16,7 @@
     <a class="plain" href="#install">安装</a>
     <a class="plain" href="#usage">使用</a>
     <a class="plain" href="#cmake">接入 CMake</a>
-    <a class="plain" href="https://github.com/luskyle/menuconfig">GitHub</a>
+    <a class="plain" href="https://github.com/luskyle/menuconfig-plusplus">GitHub</a>
     <a class="plain lang" href="en/">English</a>
   </div>
 </nav>
@@ -30,18 +30,18 @@
     </p>
 
     <div class="badges">
-      <a href="https://github.com/luskyle/menuconfig/actions/workflows/ci.yml">
-        <img src="https://github.com/luskyle/menuconfig/actions/workflows/ci.yml/badge.svg" alt="CI 状态">
+      <a href="https://github.com/luskyle/menuconfig-plusplus/actions/workflows/ci.yml">
+        <img src="https://github.com/luskyle/menuconfig-plusplus/actions/workflows/ci.yml/badge.svg" alt="CI 状态">
       </a>
-      <a href="https://github.com/luskyle/menuconfig/releases/latest">
-        <img src="https://img.shields.io/github/v/release/luskyle/menuconfig?label=release" alt="最新版本">
+      <a href="https://github.com/luskyle/menuconfig-plusplus/releases/latest">
+        <img src="https://img.shields.io/github/v/release/luskyle/menuconfig-plusplus?label=release" alt="最新版本">
       </a>
       <img src="https://img.shields.io/badge/platform-linux-x86__64-informational" alt="平台：linux-x86_64">
     </div>
 
     <div class="btns">
-      <a class="btn primary" href="https://github.com/luskyle/menuconfig/releases/latest">下载最新版本</a>
-      <a class="btn ghost" href="https://github.com/luskyle/menuconfig">查看源码</a>
+      <a class="btn primary" href="https://github.com/luskyle/menuconfig-plusplus/releases/latest">下载最新版本</a>
+      <a class="btn ghost" href="https://github.com/luskyle/menuconfig-plusplus">查看源码</a>
     </div>
 
     <figure class="term">
@@ -84,7 +84,7 @@
     <h2><span class="hash">#</span> 安装</h2>
 
     <h3>方式一：下载预编译二进制</h3>
-    <p>从 <a href="https://github.com/luskyle/menuconfig/releases/latest">Releases</a> 下载 <code>menuconfig-&lt;版本&gt;-linux-x86_64.tar.gz</code>，解包后包含 <code>mconf</code>（图形界面）和 <code>conf</code>（命令行）：</p>
+    <p>从 <a href="https://github.com/luskyle/menuconfig-plusplus/releases/latest">Releases</a> 下载 <code>menuconfig-&lt;版本&gt;-linux-x86_64.tar.gz</code>，解包后包含 <code>mconf</code>（图形界面）和 <code>conf</code>（命令行）：</p>
 <pre><span class="c">$</span> tar -xzf menuconfig-*-linux-x86_64.tar.gz
 <span class="c">$</span> cd menuconfig-*
 <span class="c">$</span> ./mconf test/rootconf</pre>
@@ -94,8 +94,8 @@
 <pre><span class="c">#</span> Debian / Ubuntu
 <span class="c">$</span> sudo apt install -y libncurses-dev cmake ninja-build
 
-<span class="c">$</span> git clone https://github.com/luskyle/menuconfig.git
-<span class="c">$</span> cd menuconfig
+<span class="c">$</span> git clone https://github.com/luskyle/menuconfig-plusplus.git
+<span class="c">$</span> cd menuconfig-plusplus
 <span class="c">$</span> cmake -S . -B build -G Ninja
 <span class="c">$</span> cmake --build build</pre>
     <div class="note">
@@ -159,7 +159,7 @@ CONFIG_NUM_PARAM=0</pre>
 <section id="cmake">
   <div class="wrap">
     <h2><span class="hash">#</span> 接入 CMake</h2>
-    <p>读取 <code>sdkconfig</code> 并把 <code>CONFIG_*</code> 转成编译宏（节选，完整版见 <a href="https://github.com/luskyle/menuconfig/blob/main/README.md">README</a>）：</p>
+    <p>读取 <code>sdkconfig</code> 并把 <code>CONFIG_*</code> 转成编译宏（节选，完整版见 <a href="https://github.com/luskyle/menuconfig-plusplus/blob/main/README.md">README</a>）：</p>
 <pre>file(STRINGS sdkconfig lines NEWLINE_CONSUME)
 string(REGEX MATCHALL "(CONFIG[a-zA-Z_0-9]+)=([a-zA-Z0-9\"]+)" result ${lines})
 
@@ -193,11 +193,11 @@ endforeach()</pre>
       <em>stand-alone mconf</em>（GPL-2.0+，Copyright © 2014）。
     </p>
     <p>
-      <a href="https://github.com/luskyle/menuconfig">源码</a> ·
-      <a href="https://github.com/luskyle/menuconfig/releases">发布记录</a> ·
-      <a href="https://github.com/luskyle/menuconfig/blob/main/README.md">README</a> ·
-      <a href="https://github.com/luskyle/menuconfig/blob/main/LICENSE">LICENSE</a> ·
-      <a href="https://github.com/luskyle/menuconfig/blob/main/LICENCE.txt">上游许可</a>
+      <a href="https://github.com/luskyle/menuconfig-plusplus">源码</a> ·
+      <a href="https://github.com/luskyle/menuconfig-plusplus/releases">发布记录</a> ·
+      <a href="https://github.com/luskyle/menuconfig-plusplus/blob/main/README.md">README</a> ·
+      <a href="https://github.com/luskyle/menuconfig-plusplus/blob/main/LICENSE">LICENSE</a> ·
+      <a href="https://github.com/luskyle/menuconfig-plusplus/blob/main/LICENCE.txt">上游许可</a>
     </p>
   </div>
 </footer>
