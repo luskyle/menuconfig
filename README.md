@@ -7,7 +7,7 @@ menuconfig
 
 在 linux kernel 源码中的 mconf 工具, 简单改造而来. 用于图形化生成项目宏配置.
 
-在线主页: <https://luskyle.github.io/menuconfig/>
+在线主页: [https://luskyle.github.io/menuconfig/](https://luskyle.github.io/menuconfig/)
 
 ![主菜单](image/README/1723619417014.png)
 
@@ -41,11 +41,11 @@ cmake --build build
 
 构建类型由两个开关控制:
 
-| 参数 | 效果 |
-| --- | --- |
-| 不传 (默认) | `DEBUG=ON`, 生成带调试信息的 Debug 构建 |
-| `-DDEBUG=OFF` | Release 构建 (`-O3 -DNDEBUG`) |
-| `-DCMAKE_BUILD_TYPE=<type>` | 显式指定构建类型, 以此为准 |
+| 参数                          | 效果                                      |
+| ----------------------------- | ----------------------------------------- |
+| 不传 (默认)                   | `DEBUG=ON`, 生成带调试信息的 Debug 构建 |
+| `-DDEBUG=OFF`               | Release 构建 (`-O3 -DNDEBUG`)           |
+| `-DCMAKE_BUILD_TYPE=<type>` | 显式指定构建类型, 以此为准                |
 
 也可以沿用仓库里的脚本 (在源码目录内构建):
 
@@ -76,20 +76,20 @@ conf --allyesconfig test/rootconf   # 全部选项取 y
 
 `conf` 的完整模式列表见 `conf --help`:
 
-| 选项 | 说明 |
-| --- | --- |
-| `--listnewconfig` | 列出新增选项 |
-| `--oldaskconfig` | 以行式问答方式新建配置 |
-| `--oldconfig` | 以已有 `.config` 为基线更新配置 |
-| `--silentoldconfig <file>` | 同 `--oldconfig` 但静默, 并把头写入 `<file>` |
-| `--olddefconfig` (`--oldnoconfig`) | 静默更新, 新符号取默认值 |
-| `--defconfig <file>` | 用 `<file>` 中定义的默认值生成新配置 |
-| `--savedefconfig <file>` | 把当前配置的最小集保存到 `<file>` |
-| `--allnoconfig` | 全部选项取 `n` |
-| `--allyesconfig` | 全部选项取 `y` |
-| `--allmodconfig` | 全部选项取 `m` |
-| `--alldefconfig` | 全部符号取默认值 |
-| `--randconfig` | 随机应答所有选项 |
+| 选项                                   | 说明                                            |
+| -------------------------------------- | ----------------------------------------------- |
+| `--listnewconfig`                    | 列出新增选项                                    |
+| `--oldaskconfig`                     | 以行式问答方式新建配置                          |
+| `--oldconfig`                        | 以已有`.config` 为基线更新配置                |
+| `--silentoldconfig <file>`           | 同`--oldconfig` 但静默, 并把头写入 `<file>` |
+| `--olddefconfig` (`--oldnoconfig`) | 静默更新, 新符号取默认值                        |
+| `--defconfig <file>`                 | 用`<file>` 中定义的默认值生成新配置           |
+| `--savedefconfig <file>`             | 把当前配置的最小集保存到`<file>`              |
+| `--allnoconfig`                      | 全部选项取`n`                                 |
+| `--allyesconfig`                     | 全部选项取`y`                                 |
+| `--allmodconfig`                     | 全部选项取`m`                                 |
+| `--alldefconfig`                     | 全部符号取默认值                                |
+| `--randconfig`                       | 随机应答所有选项                                |
 
 ## 读取宏配置
 
