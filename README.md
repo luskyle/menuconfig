@@ -1,11 +1,13 @@
-menuconfig
-==========
+menuconfig++
+============
+
+**简体中文** | [English](README.en.md)
 
 [![CI](https://github.com/luskyle/menuconfig/actions/workflows/ci.yml/badge.svg)](https://github.com/luskyle/menuconfig/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/luskyle/menuconfig?label=release)](https://github.com/luskyle/menuconfig/releases/latest)
 ![Platform](https://img.shields.io/badge/platform-linux--x86__64-informational)
 
-在 linux kernel 源码中的 mconf 工具, 简单改造而来. 用于图形化生成项目宏配置.
+从 linux kernel 源码中的 mconf 工具优化改造而来。用于图形化生成项目宏配置。
 
 在线主页: [https://luskyle.github.io/menuconfig/](https://luskyle.github.io/menuconfig/)
 
@@ -14,6 +16,7 @@ menuconfig
 ## 特性
 
 * 内核同款 TUI: 方向键导航、`<Y>`/`<N>`/`<M>` 开关高亮项、`?` 或 `< Help >` 查看帮助、`/` 搜索
+* 中文界面: 链接宽字符版 `ncursesw`, 标题、菜单、帮助窗口按显示列宽居中与截断, 中文项不错位也不被砍成半个字
 * 完整 kconfig 语义: `bool` / `tristate` / `int` / `hex` / `string`、`choice`、`depends on`、`select`、多层子菜单与 `source` 文件包含
 * 生成 `sdkconfig`, 可直接被 CMake 读取为编译宏
 * `conf` 提供非交互模式 (`--olddefconfig` / `--defconfig` / `--allyesconfig` 等), 可放入脚本与 CI
@@ -21,7 +24,7 @@ menuconfig
 ## 依赖
 
 * C 编译器 (gcc / clang)
-* ncurses 开发库
+* ncurses 开发库 (需要其中的**宽字符版 `ncursesw`**, 窄字符库会把中文按字节转义成乱码)
 
 ```bash
 # Debian / Ubuntu
@@ -143,7 +146,8 @@ message("==========================配置文件解析完毕=====================
 
 ## TODO
 
-* [ ] 配置文件中文展示乱码
+* [x] 配置文件中文展示乱码 —— 已解决 (v0.1.0): 改用宽字符版 `ncursesw`, 并按显示列宽渲染/居中/截断
+* [ ] 输入框 (字符串参数、`/` 搜索、`Save as` 文件名) 支持键入与编辑中文
 
 ## 许可
 
